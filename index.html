@@ -132,7 +132,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);bo
 .save-status.error{background:#FEE;color:#c0392b;}
 
 /* TOAST */
-.toast{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);background:var(--g1);color:#fff;padding:.6rem 1.35rem;border-radius:8px;font-size:.88rem;z-index:9999;display:none;box-shadow:0 4px 18px rgba(0,0,0,.28);}
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:#c0392b;color:#fff;padding:.75rem 1.5rem;border-radius:8px;font-size:1rem;font-weight:700;z-index:99999;display:none;box-shadow:0 4px 18px rgba(0,0,0,.4);min-width:220px;text-align:center;}
 
 @media print{.nav,.btn,.btn-row,.nav-tabs,.step-tracker,.prog-wrap,.func-selector{display:none!important;}}
 </style>
@@ -318,7 +318,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);bo
 //  ★ 구글 Apps Script 배포 URL을 여기에 입력 ★
 //  배포 후 받은 URL을 복사해서 아래에 붙여넣기
 // ═══════════════════════════════════════════════
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyusVIMUKdCcHLr936r-lpevTaWL7JRqpYlfpd2J5cLDR6HWYQyOHW_7FKRm9K3pZ-h/exec
+const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+
 // ── 유틸 ─────────────────────────────────────────
 function goTab(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -406,19 +407,30 @@ function updateTracker(n){
 }
 
 function goStep(n){
-  if(n===1){
-    if(!document.getElementById('myName').value.trim()){toast('⚠ 내 이름을 입력해 주세요.');return;}
-    if(!document.getElementById('mentorName').value.trim()){toast('⚠ 멘토 이름을 입력해 주세요.');return;}
-    if(!document.getElementById('mentorDesc').value.trim()){toast('⚠ 영향 내용을 입력해 주세요.');return;}
+  try {
+    if(n===1){
+      var nm=document.getElementById('myName').value.trim();
+      var mn=document.getElementById('mentorName').value.trim();
+      var md=document.getElementById('mentorDesc').value.trim();
+      if(!nm){alert('내 이름을 입력해 주세요.');return;}
+      if(!mn){alert('멘토 이름을 입력해 주세요.');return;}
+      if(!md){alert('영향 내용을 입력해 주세요.');return;}
+    }
+    if(n===2){
+      var c=document.querySelectorAll('#funcSel input:checked');
+      if(c.length===0){alert('기능을 하나 이상 선택해 주세요.');return;}
+    }
+    stepEls.forEach(function(id,i){
+      var el=document.getElementById(id);
+      if(el) el.style.display=(i===n)?'block':'none';
+    });
+    curStep=n;
+    updateTracker(n);
+    window.scrollTo({top:0,behavior:'smooth'});
+  } catch(err) {
+    console.error('goStep error:',err);
+    alert('오류: '+err.message);
   }
-  if(n===2){
-    const c=[...document.querySelectorAll('#funcSel input:checked')];
-    if(c.length===0){toast('⚠ 기능을 하나 이상 선택해 주세요.');return;}
-  }
-  stepEls.forEach((id,i)=>document.getElementById(id).style.display=i===n?'block':'none');
-  curStep=n;
-  updateTracker(n);
-  document.querySelector('.step-tracker').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ── 리포트 ────────────────────────────────────────
